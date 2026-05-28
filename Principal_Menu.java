@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Principal_Menu {
     public static void main(String[] args) {
         String[][] matrizCliente = new String[0][8];
-        String[][] matrizContato = new String[0][5];
+        String[][] matrizContato = new String[0][6];
         menuPrincipal(matrizCliente, matrizContato);
     }
 
@@ -31,10 +31,10 @@ public class Principal_Menu {
 
             switch (opçaoPrincipal) {
                 case 1:
-                    menuGerenciarCliente(matrizCliente);
+                    matrizCliente = menuGerenciarCliente(matrizCliente);
                     break;
                 case 2:
-                    menuGerenciarContatos(matrizContato);
+                    matrizContato = menuGerenciarContato(matrizCliente, matrizContato);
                     break;
                 case 3:
                     relatorioFinal(matrizCliente, matrizContato);
@@ -51,7 +51,7 @@ public class Principal_Menu {
     }
 
     // Função CRUD DE CLIENTES
-    private static void menuGerenciarCliente(String[][] matrizCliente) {
+    private static String[][] menuGerenciarCliente(String[][] matrizCliente) {
         int opcaoCliente = -1;
         do {
             Scanner leia = new Scanner(System.in);
@@ -98,6 +98,7 @@ public class Principal_Menu {
             }
 
         } while (opcaoCliente != 0);
+        return matrizCliente;
     }
 
     // Criando uma matriz que aumenta  a nossa matriz principal de Clientes
@@ -118,11 +119,11 @@ public class Principal_Menu {
     }
 
     // Criando uma matriz que aumenta a nossa matriz principal de Contatos
-    //cria uma maior, copia matrizantiga, devolve a nova
+    // Cria uma maior, copia matrizantiga, devolve a nova
     public static String[][] aumentoMatriz(String[][] matrizAntigaCo) {
-        String[][] novaContato = new String[matrizAntigaCo.length + 1][5];
+        String[][] novaContato = new String[matrizAntigaCo.length + 1][6];
         for (int i = 0; i < matrizAntigaCo.length; i++) {
-            for (int j = 0; j < 5; j++) {
+            for (int j = 0; j < 6; j++) {
                 novaContato[i][j] = matrizAntigaCo[i][j];
             }
         }
@@ -154,10 +155,9 @@ public class Principal_Menu {
         matrizCliente[novaLinha][5] = leia.nextLine();
         System.out.println("Digite o Estado do cliente: ");
         matrizCliente[novaLinha][6] = leia.nextLine();
-        System.out.println("Digite o Status do cliente: ");
+        System.out.println("Digite o Status do cliente (ATIVO/INATIVO): ");
         matrizCliente[novaLinha][7] = leia.nextLine();
         System.out.println("Cadastro realizado com sucesso!");
-
     }
 
 
@@ -175,16 +175,14 @@ public class Principal_Menu {
             System.out.println("Status     | ");
             System.out.println("----------------------------------------------");
             for (int i = 0; i < matrizCliente.length; i++) {
-                System.out.println(i + "  |  ");
-                System.out.println(matrizCliente[i][0] + "  |  ");
-                System.out.println(matrizCliente[i][1] + "  |  ");
-                System.out.println(matrizCliente[i][2] + "  |  ");
-                System.out.println(matrizCliente[i][3] + "  |  ");
-                System.out.println(matrizCliente[i][4] + "  |  ");
-                System.out.println(matrizCliente[i][5] + "  |  ");
-                System.out.println(matrizCliente[i][6] + "  |  ");
+                System.out.print(matrizCliente[i][0] + "  |  ");
+                System.out.print(matrizCliente[i][1] + "  |  ");
+                System.out.print(matrizCliente[i][2] + "  |  ");
+                System.out.print(matrizCliente[i][3] + "  |  ");
+                System.out.print(matrizCliente[i][4] + "  |  ");
+                System.out.print(matrizCliente[i][5] + "  |  ");
+                System.out.print(matrizCliente[i][6] + "  |  ");
                 System.out.println(matrizCliente[i][7] + "  |  ");
-
             }
         }
     }
@@ -397,6 +395,385 @@ public class Principal_Menu {
         } else {
             return false;
         }
+    }
+
+    private static String[][] menuGerenciarContato(String[][] matrizCliente, String[][] matrizContato) {
+        int opcaoCliente = -1;
+        do {
+            Scanner leia = new Scanner(System.in);
+            System.out.println("----------------------------------------");
+            System.out.println("        MENU GERENCIAR CONTATO        ");
+            System.out.println("----------------------------------------");
+            System.out.println("1. Incluir contato");
+            System.out.println("2. Listar contatos (Todos Clientes)");
+            System.out.println("3. Consultar contatos de um cliente");
+            System.out.println("4. Alterar contato");
+            System.out.println("5. Apagar contato");
+            System.out.println("0. Voltar");
+            System.out.println("Digite o número corresponde a operação que deseja realizar: ");
+            opcaoCliente = leia.nextInt();
+
+            switch (opcaoCliente) {
+                case 1:
+                    matrizContato = aumentoMatriz(matrizContato);
+                    incluirContato(matrizContato, matrizCliente);
+                    break;
+                case 2:
+                    listarContatos(matrizContato, matrizCliente);
+                    break;
+                case 3:
+                    consultarContatos(matrizContato, matrizCliente);
+                    break;
+                case 4:
+                    alterarContato(matrizContato, matrizCliente);
+                    break;
+                case 5:
+                    matrizContato = excluirContato(matrizContato, matrizCliente);
+                    break;
+                case 0:
+                    System.out.println("Saindo do sistema...");
+                    break;
+                default:
+                    System.out.println("Opção Inválida! Digite novamente.");
+                    break;
+            }
+
+        } while (opcaoCliente != 0);
+        return matrizContato;
+    }
+
+    private static void incluirContato(String[][] matrizContato, String[][] matrizCliente) {
+        int novaLinha = matrizContato.length - 1;
+        boolean clienteEncontrado = false;
+
+        Scanner leia = new Scanner(System.in);
+
+        System.out.println("------ CADASTRANDO CONTATO ------");
+        int codCliente = 0;
+
+        if (matrizCliente.length > 0) {
+            listarCliente(matrizCliente);
+            System.out.println("Digite o codigo do Cliente: ");
+            codCliente = leia.nextInt();
+            leia.nextLine();
+        }
+
+        String nomeCliente = "";
+        for (int i = 0; i < matrizCliente.length; i++) {
+            if (matrizCliente[i][0] != null && matrizCliente[i][0].equals(String.valueOf(codCliente))) {
+                clienteEncontrado = true;
+                nomeCliente = matrizCliente[i][1];
+                break;
+            }
+        }
+        boolean breakRepeat = true;
+        if (clienteEncontrado) {
+            matrizContato[novaLinha][0] = String.valueOf(novaLinha + 1);
+            matrizContato[novaLinha][1] = String.valueOf(codCliente);
+            matrizContato[novaLinha][2] = nomeCliente;
+
+            do {
+                System.out.println("Digite o tipo de contato: \n1. Telefone\n2. Whatsapp\n3. Email\n4. Instagram\n5. Site\n6. Linkedln\n7. Outro");
+                int opcao = leia.nextInt();
+                leia.nextLine();
+                switch (opcao) {
+                    case 1:
+                        System.out.println("Informe o telefone: ");
+                        String telefone = leia.nextLine();
+                        matrizContato[novaLinha][3] = "Telefone";
+                        matrizContato[novaLinha][4] = telefone;
+                        matrizContato[novaLinha][5] = "ATIVO";
+                        breakRepeat = false;
+                        break;
+                    case 2:
+                        System.out.println("Informe o numero de whatsapp: ");
+                        String whatsapp = leia.nextLine();
+                        matrizContato[novaLinha][3] = "Whatsapp";
+                        matrizContato[novaLinha][4] = whatsapp;
+                        matrizContato[novaLinha][5] = "ATIVO";
+                        breakRepeat = false;
+                        break;
+                    case 3:
+                        System.out.println("Informe o E-mail: ");
+                        String email = leia.nextLine();
+                        matrizContato[novaLinha][3] = "E-mail";
+                        matrizContato[novaLinha][4] = email;
+                        matrizContato[novaLinha][5] = "ATIVO";
+                        breakRepeat = false;
+                        break;
+                    case 4:
+                        System.out.println("Informe o @ do instagram: ");
+                        String instagram = leia.nextLine();
+                        matrizContato[novaLinha][3] = "Instagram";
+                        matrizContato[novaLinha][4] = instagram;
+                        matrizContato[novaLinha][5] = "ATIVO";
+                        breakRepeat = false;
+                        break;
+                    case 5:
+                        System.out.println("Informe o link do site/blog: ");
+                        String site = leia.nextLine();
+                        matrizContato[novaLinha][3] = "Site/Blog";
+                        matrizContato[novaLinha][4] = site;
+                        matrizContato[novaLinha][5] = "ATIVO";
+                        breakRepeat = false;
+                        break;
+                    case 6:
+                        System.out.println("Informe o link do Linkedln: ");
+                        String linkedln = leia.nextLine();
+                        matrizContato[novaLinha][3] = "Linkedln";
+                        matrizContato[novaLinha][4] = linkedln;
+                        matrizContato[novaLinha][5] = "ATIVO";
+                        breakRepeat = false;
+                        break;
+                    case 7:
+                        System.out.println("Informe o contato desejado: ");
+                        String outroContato = leia.nextLine();
+                        matrizContato[novaLinha][3] = "Outro";
+                        matrizContato[novaLinha][4] = outroContato;
+                        matrizContato[novaLinha][5] = "ATIVO";
+                        breakRepeat = false;
+                        break;
+                    default:
+                        System.out.println("Opcao Invalida, tente novamente!");
+                        break;
+                }
+            } while (breakRepeat);
+            System.out.println("Contato cadastrado com sucesso!");
+        } else if (!clienteEncontrado && matrizCliente.length > 0) {
+            System.out.println("Esse codigo de cliente nao existe!");
+        } else {
+            System.out.println("Nenhum cliente foi encontrado! Cadastre um novo cliente");
+        }
+    }
+
+    private static void listarContatos(String[][] matrizContato, String[][] matrizCliente) {
+        System.out.println("------ CONSULTA DE CONTATOS ------");
+        if (matrizContato.length == 0) {
+            System.out.println("Nenhum contato encontrado!");
+        } else {
+            System.out.print("CodCont | ");
+            System.out.print("CodCliente | ");
+            System.out.print("Nome Cliente    | ");
+            System.out.print("Tipo    | ");
+            System.out.print("Valor    | ");
+            System.out.println("Status   | ");
+            System.out.println("----------------------------------------------");
+            for (int i = 0; i < matrizContato.length; i++) {
+                System.out.print(matrizContato[i][0] + "  |  ");
+                System.out.print(matrizContato[i][1] + "  |  ");
+                System.out.print(matrizContato[i][2] + "  |  ");
+                System.out.print(matrizContato[i][3] + "  |  ");
+                System.out.print(matrizContato[i][4] + "  |  ");
+                System.out.println(matrizContato[i][5]);
+            }
+        }
+    }
+
+    private static void consultarContatos(String[][] matrizContato, String[][] matrizCliente) {
+        System.out.println("------ CONSULTA DE CONTATOS POR CLIENTE ------");
+        if (matrizContato.length == 0) {
+            System.out.println("Nenhum contato encontrado!");
+        } else {
+            listarCliente(matrizCliente);
+            Scanner leia = new Scanner(System.in);
+            System.out.println("Informe o codigo do cliente: ");
+            int codCliente = leia.nextInt();
+
+            System.out.print("CodCont  |");
+            System.out.print("CodCliente |");
+            System.out.print("Nome Cliente |");
+            System.out.print("Tipo       |");
+            System.out.print("Valor         |");
+            System.out.println("Status |");
+            System.out.println("--------------------------------------------------------------------------");
+            boolean clienteEncontrado = false;
+            for (int i = 0; i < matrizContato.length; i++) {
+                if (matrizContato[i][1] != null && matrizContato[i][1].equals(String.valueOf(codCliente))) {
+                    System.out.print(matrizContato[i][0] + "       |  ");
+                    System.out.print(matrizContato[i][1] + "       | ");
+                    System.out.print(matrizContato[i][2] + "      | ");
+                    System.out.print(matrizContato[i][3] + " | ");
+                    System.out.print(matrizContato[i][4] + " | ");
+                    System.out.println(matrizContato[i][5] + " | ");
+
+                    clienteEncontrado = true;
+                }
+            }
+            if (!clienteEncontrado) {
+                System.out.println("Nenhum contato cadastrado para este cliente!");
+            }
+        }
+    }
+
+    private static void alterarContato(String[][] matrizContato, String[][] matrizCliente) {
+        Scanner leia = new Scanner(System.in);
+        System.out.println("---- ALTERAR CONTATO ----");
+        int codContato = 0;
+        if (matrizContato.length > 0) {
+            listarContatos(matrizContato, matrizCliente);
+            System.out.println("Digite o codigo do contato: ");
+            codContato = leia.nextInt();
+        }
+
+        boolean contatoExiste = false;
+
+        for (int i = 0; i < matrizContato.length; i++) {
+            if (matrizContato[i][0] != null && matrizContato[i][0].equals(String.valueOf(codContato))) {
+                contatoExiste = true;
+                System.out.println("Contato encontrado");
+                System.out.print("CodCont  |");
+                System.out.print("CodCliente |");
+                System.out.print("Nome Cliente |");
+                System.out.print("Tipo       |");
+                System.out.print("Valor         |");
+                System.out.println("Status |");
+                System.out.println("--------------------------------------------------------------------------");
+
+                System.out.print(matrizContato[i][0] + "       |  ");
+                System.out.print(matrizContato[i][1] + "       | ");
+                System.out.print(matrizContato[i][2] + "      | ");
+                System.out.print(matrizContato[i][3] + " | ");
+                System.out.print(matrizContato[i][4] + " | ");
+                System.out.println(matrizContato[i][5] + " | ");
+
+                System.out.println("\nDeseja alterar esse contato? \n1. SIM\n2. NAO");
+                int opcao = leia.nextInt();
+                leia.nextLine();
+                if (opcao == 1) {
+                    boolean breakRepeat = true;
+                    do {
+                        System.out.println("\nDigite o tipo de contato: \n1. Telefone\n2. Whatsapp\n3. Email\n4. Instagram\n5. Site\n6. Linkedln\n7. Outro\n");
+                        int opcaoTipo = leia.nextInt();
+                        leia.nextLine();
+                        switch (opcaoTipo) {
+                            case 1:
+                                System.out.println("Informe o telefone: ");
+                                String telefone = leia.nextLine();
+                                matrizContato[i][3] = "Telefone";
+                                matrizContato[i][4] = telefone;
+                                breakRepeat = false;
+                                break;
+                            case 2:
+                                System.out.println("Informe o numero de whatsapp: ");
+                                String whatsapp = leia.nextLine();
+                                matrizContato[i][3] = "Whatsapp";
+                                matrizContato[i][4] = whatsapp;
+                                breakRepeat = false;
+                                break;
+                            case 3:
+                                System.out.println("Informe o E-mail: ");
+                                String email = leia.nextLine();
+                                matrizContato[i][3] = "E-mail";
+                                matrizContato[i][4] = email;
+                                breakRepeat = false;
+                                break;
+                            case 4:
+                                System.out.println("Informe o @ do instagram: ");
+                                String instagram = leia.nextLine();
+                                matrizContato[i][3] = "Instagram";
+                                matrizContato[i][4] = instagram;
+                                breakRepeat = false;
+                                break;
+                            case 5:
+                                System.out.println("Informe o link do site/blog: ");
+                                String site = leia.nextLine();
+                                matrizContato[i][3] = "Site/Blog";
+                                matrizContato[i][4] = site;
+                                breakRepeat = false;
+                                break;
+                            case 6:
+                                System.out.println("Informe link do Linkedln: ");
+                                String linkedln = leia.nextLine();
+                                matrizContato[i][3] = "Linkedln";
+                                matrizContato[i][4] = linkedln;
+                                breakRepeat = false;
+                                break;
+                            case 7:
+                                System.out.println("Informe o contato desejado: ");
+                                String outroContato = leia.nextLine();
+                                matrizContato[i][3] = "Outro";
+                                matrizContato[i][4] = outroContato;
+                                breakRepeat = false;
+                                break;
+                            default:
+                                System.out.println("Opcao Invalida, tente novamente!");
+                                break;
+                        }
+                    } while (breakRepeat);
+                    System.out.println("Contato alterado com sucesso!");
+                }
+            }
+
+        }
+        if (!contatoExiste) {
+            System.out.println("Contato nao encontrado!");
+        }
+    }
+
+    private static String[][] excluirContato(String[][] matrizContato, String[][] matrizCliente) {
+        Scanner leia = new Scanner(System.in);
+        System.out.println("--- APAGAR CONTATO ---");
+        int codContato = 0;
+        if (matrizContato.length > 0) {
+            listarContatos(matrizContato, matrizCliente);
+            System.out.println("Digite o codigo do contato: ");
+            codContato = leia.nextInt();
+            leia.nextLine();
+        }
+
+        boolean contatoExiste = false;
+        int codCont = -1;
+        for (int i = 0; i < matrizContato.length; i++) {
+            if (matrizContato[i][0] != null && matrizContato[i][0].equals(String.valueOf(codContato))) {
+                codCont = i;
+                contatoExiste = true;
+                System.out.println("Contato encontrado!");
+
+                System.out.print("CodCont  |");
+                System.out.print("CodCliente |");
+                System.out.print("Tipo       |");
+                System.out.print("Valor         |");
+                System.out.println("Status |");
+                System.out.println("--------------------------------------------------------------------------");
+
+                System.out.print(matrizContato[i][0] + "       |  ");
+                System.out.print(matrizContato[i][1] + "       | ");
+                System.out.print(matrizContato[i][3] + " | ");
+                System.out.print(matrizContato[i][4] + " | ");
+                System.out.println(matrizContato[i][5] + " | ");
+                break;
+            }
+        }
+        if (contatoExiste) {
+            System.out.println("Deseja excluir a contato? \n1. SIM\n2. NAO");
+            int opcao = leia.nextInt();
+            leia.nextLine();
+
+            if (opcao == 1) {
+                String[][] novaMatriz = new String[matrizContato.length - 1][6];
+                int nova = 0;
+
+                for (int j = 0; j < matrizContato.length; j++) {
+                    if (j == codCont) {
+                        continue;
+                    }
+                    novaMatriz[nova][0] = matrizContato[j][0] = String.valueOf(nova + 1);
+                    novaMatriz[nova][1] = matrizContato[j][1];
+                    novaMatriz[nova][2] = matrizContato[j][2];
+                    novaMatriz[nova][3] = matrizContato[j][3];
+                    novaMatriz[nova][4] = matrizContato[j][4];
+                    novaMatriz[nova][5] = matrizContato[j][5];
+                    nova++;
+                }
+                System.out.println("Contato excluído com sucesso!");
+                return novaMatriz;
+            } else if (opcao == 2) {
+                System.out.println("Exclusão cancelada.");
+            }
+        }else {
+            System.out.println("Contato nao encontrado!");
+        }
+        return matrizContato;
     }
 }
 
