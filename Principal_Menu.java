@@ -798,6 +798,7 @@ public class Principal_Menu {
                     }
                     copiarLinha(matrizContato, novaMatriz, j, nova);
                     novaMatriz[nova][0] = String.valueOf(nova + 1);
+                    nova++;
                 }
                 System.out.println("Contato excluído com sucesso!");
                 return novaMatriz;
@@ -936,6 +937,10 @@ public class Principal_Menu {
     private static void relatorioFinal(String[][] matrizCliente, String[][] matrizContato) {
 
         // Função RELATAR TODOS OS DADOS NO FINAL
+
+
+
+
         int totalClientes = matrizCliente.length;
         int totalContatos = matrizContato.length;
         int clientesSemContato = 0;
