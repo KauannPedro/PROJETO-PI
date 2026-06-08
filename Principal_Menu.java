@@ -1,5 +1,4 @@
 import java.util.Scanner;
-
 /**
  *
  * @author VITÓRIA E OS PREGUIÇAS
@@ -63,6 +62,7 @@ public class Principal_Menu {
             System.out.println("5. Apagar cliente");
             System.out.println("6. Ordenar por nome");
             System.out.println("7. Pesquisar cliente por nome");
+            System.out.println("8. Limpar Cliente");
             System.out.println("0. Voltar");
             System.out.println("Digite o número corresponde a operação que deseja realizar: ");
             opcaoCliente = leia.nextInt();
@@ -91,6 +91,14 @@ public class Principal_Menu {
                 case 7:
                     pesquisarClienteNome(matrizCliente);
                     break;
+                case 8:
+                    System.out.print("Digite o ID p/ limpar os dados: \n");
+                    int op = leia.nextInt();
+                    limparLinha(matrizCliente, op-1);
+                    System.out.println("Cliente limpo com sucesso");
+                    listarCliente(matrizCliente);
+                    break;
+
                 case 0:
                     System.out.println("Saindo do sistema...");
                     break;
@@ -132,8 +140,6 @@ public class Principal_Menu {
     }
 
 
-    // Função RELATAR TODOS OS DADOS NO FINAL
-
     // Função que coleta/registar os dados do CLIENTE
     private static void incluirCliente(String[][] matrizCliente) {
         int novaLinha = matrizCliente.length - 1;
@@ -146,14 +152,15 @@ public class Principal_Menu {
 
         String documento;
 
+
         do {
             System.out.println("Digite CPF ou CNPJ:");
             documento = leia.nextLine().trim();
+            //DESAFIO
             if(documento.length() == 11 || documento.length() == 14){
                 matrizCliente[novaLinha][2] = documento;
                 break;
             } else {
-                //desafio de validação de CPF/CNPJ apenas pelo tamanho
                 System.out.println("Documento inválido! CPF = 11 dígitos | CNPJ = 14 dígitos");
             }
 
@@ -232,7 +239,7 @@ public class Principal_Menu {
         }
     }
 
-    //desafio pesquisar cliente por parte do nome
+    //DESAFIO
     private static void pesquisarClienteNome(String[][] matrizCliente) {
 
         Scanner leia = new Scanner(System.in);
@@ -332,6 +339,7 @@ public class Principal_Menu {
             return matrizCliente;
         }
 
+        listarCliente(matrizCliente);
         Scanner leia = new Scanner(System.in);
 
         System.out.println("-- APAGAR CLIENTE --");
@@ -362,12 +370,8 @@ public class Principal_Menu {
 
 
             if (novaLinha < novaMatriz.length) { // evita erro caso o cliente não exista
-
-
-                for (int j = 0; j < 8; j++) { // percorre todas as colunas
-                    novaMatriz[novaLinha][j] = matrizCliente[i][j]; // copia os dados da matriz antiga para a nova
-                }
-                novaLinha++; // passa para próxima linha da nova matriz
+                copiarLinha(matrizCliente, novaMatriz, i, novaLinha);
+                novaLinha++;
             }
         }
 
@@ -390,43 +394,17 @@ public class Principal_Menu {
     private static void ordenarPorNome(String[][] matrizCliente) {
         for (int i = 0; i < matrizCliente.length - 1; i++) {
             for (int j = i + 1; j < matrizCliente.length; j++) {
-                if (maiorNome(matrizCliente[i][1], matrizCliente[j][1])) {
+                if (compararNomeCharPorChar(matrizCliente[i][1], matrizCliente[j][1])) {
 
-                    String codigo = matrizCliente[i][0];
-                    String nome = matrizCliente[i][1];
-                    String cpf = matrizCliente[i][2];
-                    String nasc = matrizCliente[i][3];
-                    String sexo = matrizCliente[i][4];
-                    String cidade = matrizCliente[i][5];
-                    String estado = matrizCliente[i][6];
-                    String status = matrizCliente[i][7];
-
-
-                    matrizCliente[i][0] = matrizCliente[j][0];
-                    matrizCliente[i][1] = matrizCliente[j][1];
-                    matrizCliente[i][2] = matrizCliente[j][2];
-                    matrizCliente[i][3] = matrizCliente[j][3];
-                    matrizCliente[i][4] = matrizCliente[j][4];
-                    matrizCliente[i][5] = matrizCliente[j][5];
-                    matrizCliente[i][6] = matrizCliente[j][6];
-                    matrizCliente[i][7] = matrizCliente[j][7];
-
-                    matrizCliente[j][0] = codigo;
-                    matrizCliente[j][1] = nome;
-                    matrizCliente[j][2] = cpf;
-                    matrizCliente[j][3] = nasc;
-                    matrizCliente[j][4] = sexo;
-                    matrizCliente[j][5] = cidade;
-                    matrizCliente[j][6] = estado;
-                    matrizCliente[j][7] = status;
+                    trocaLinhas(matrizCliente, i, j);
                 }
-
             }
         }
+        System.out.println("Ordenados!!");
     }
 
     // Função que guarda o maior nome
-    private static boolean maiorNome(String nome1, String nome2) {
+    private static boolean compararNomeCharPorChar(String nome1, String nome2) {
         nome1 = nome1.toUpperCase();
         nome2 = nome2.toUpperCase();
 
@@ -818,13 +796,8 @@ public class Principal_Menu {
                     if (j == codCont) {
                         continue;
                     }
-                    novaMatriz[nova][0] = matrizContato[j][0] = String.valueOf(nova + 1);
-                    novaMatriz[nova][1] = matrizContato[j][1];
-                    novaMatriz[nova][2] = matrizContato[j][2];
-                    novaMatriz[nova][3] = matrizContato[j][3];
-                    novaMatriz[nova][4] = matrizContato[j][4];
-                    novaMatriz[nova][5] = matrizContato[j][5];
-                    nova++;
+                    copiarLinha(matrizContato, novaMatriz, j, nova);
+                    novaMatriz[nova][0] = String.valueOf(nova + 1);
                 }
                 System.out.println("Contato excluído com sucesso!");
                 return novaMatriz;
@@ -838,7 +811,7 @@ public class Principal_Menu {
         return matrizContato;
     }
 
-    //desafio listar contato por tipo
+    //DESAFIO
     private static void listarContatosPorTipo(String[][] matrizContato){
 
         Scanner leia = new Scanner(System.in);
@@ -912,7 +885,7 @@ public class Principal_Menu {
         }
     }
 
-    //desafio permitir ordenar contatos por tipo
+    //DESAFIO
     private static void ordenarContatosPorTipo(String[][] matrizContato){
 
         for(int i = 0; i < matrizContato.length; i++){
@@ -921,30 +894,9 @@ public class Principal_Menu {
 
                 if(matrizContato[i][3] != null &&
                         matrizContato[j][3] != null &&
-                        maiorNome(matrizContato[i][3], matrizContato[j][3])){
+                        compararNomeCharPorChar(matrizContato[i][3], matrizContato[j][3])){
 
-                    // guardar linha inteira
-                    String codContato = matrizContato[i][0];
-                    String codCliente = matrizContato[i][1];
-                    String nome = matrizContato[i][2];
-                    String tipo = matrizContato[i][3];
-                    String valor = matrizContato[i][4];
-                    String status = matrizContato[i][5];
-
-                    // troca
-                    matrizContato[i][0] = matrizContato[j][0];
-                    matrizContato[i][1] = matrizContato[j][1];
-                    matrizContato[i][2] = matrizContato[j][2];
-                    matrizContato[i][3] = matrizContato[j][3];
-                    matrizContato[i][4] = matrizContato[j][4];
-                    matrizContato[i][5] = matrizContato[j][5];
-
-                    matrizContato[j][0] = codContato;
-                    matrizContato[j][1] = codCliente;
-                    matrizContato[j][2] = nome;
-                    matrizContato[j][3] = tipo;
-                    matrizContato[j][4] = valor;
-                    matrizContato[j][5] = status;
+                    trocaLinhas(matrizContato, i, j);
                 }
             }
         }
@@ -952,6 +904,35 @@ public class Principal_Menu {
         System.out.println("Contatos ordenados por tipo!");
     }
 
+    //AUXILIAR
+    private static void trocaLinhas(String[][]matriz, int linha1, int linha2){
+
+        for(int c = 0; c < matriz[0].length; c++){
+
+            // linha1 = I ; linha2 = J
+
+            //ANALOGIA DOS 3 COPOS
+            String aux = matriz[linha1][c];
+            matriz[linha1][c] = matriz[linha2][c];
+            matriz[linha2][c] = aux;
+        }
+
+    }
+    //AUXILIAR
+    private static void copiarLinha(String[][]origem, String[][]destino, int linhaOrigem, int linhaDestino){
+        for (int j = 0; j < origem[0].length; j++) {
+            destino[linhaDestino][j] = origem[linhaOrigem][j];
+        }
+    }
+
+    //AUXILIAR
+    private static void limparLinha(String[][] matriz, int linha) {
+        for (int j = 1; j < matriz[linha].length; j++) {
+            matriz[linha][j] = null;
+        }
+    }
+
+    // Função RELATAR TODOS OS DADOS NO FINAL
     private static void relatorioFinal(String[][] matrizCliente, String[][] matrizContato) {
 
         // Função RELATAR TODOS OS DADOS NO FINAL
@@ -997,11 +978,11 @@ public class Principal_Menu {
         {
             mediaContato = (double) totalContatos / totalClientes;
         }
-
         System.out.println("\n--------- SUMARIZAÇÃO ---------");
         System.out.println("Total de clientes: "+totalClientes);
         System.out.println("Total de contatos: "+totalContatos);
         System.out.println("Média contatos por cliente: "+mediaContato);
         System.out.println("Clientes sem contato: "+clientesSemContato + " \n");
     }
+
 }
